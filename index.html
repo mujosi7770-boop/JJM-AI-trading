@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanguard - e-Mola Intelligence v4.1</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'v-bg': '#05070a',
+                        'v-card': 'rgba(22, 27, 40, 0.8)',
+                        'v-accent': '#00ff85',
+                        'v-danger': '#ff4d4d',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #05070a; color: white; overflow-x: hidden; }
+        #splash { transition: opacity 0.8s ease; }
+        .loader { border: 3px solid rgba(255,255,255,0.05); border-top: 3px solid #00ff85; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .glass-card { background: rgba(22, 27, 40, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .view { display: none; animation: fadeIn 0.4s ease-out; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-up { animation: pulseGreen 1s; }
+        .pulse-down { animation: pulseRed 1s; }
+        @keyframes pulseGreen { 0% { color: #00ff85; } 100% { color: white; } }
+        @keyframes pulseRed { 0% { color: #ff4d4d; } 100% { color: white; } }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="fixed -top-16 left-1/2 -translate-x-1/2 bg-v-accent text-black px-6 py-3 rounded-full font-bold shadow-lg transition-all duration-500 z-[10000]">Action réussie !</div>
+
+    <div id="splash" class="fixed inset-0 bg-v-bg flex flex-col justify-center items-center z-[9999]">
+        <div class="loader w-12 h-12 rounded-full mb-6"></div>
+        <h2 class="text-3xl font-black tracking-tighter italic">VANGUARD</h2>
+        <p class="text-gray-500 mt-2 text-[10px] uppercase tracking-widest italic">Neural Trading Interface</p>
+    </div>
+
+    <div id="v-auth" class="fixed inset-0 bg-v-bg z-[5000] p-8 flex flex-col justify-center">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-black text-v-accent italic tracking-tighter">VANGUARD</h2>
+            <p class="text-gray-500 text-[10px] uppercase tracking-[0.3em]">IA TRADING SYSTEM</p>
+        </div>
+
+        <div id="form-register" class="space-y-4">
+            <input type="text" id="reg-name" placeholder="Nom Complet" class="w-full p-4 rounded-xl bg-v-card border border-white/10 outline-none text-sm text-white">
+            <div class="flex gap-2">
+                <input type="number" id="reg-tel" placeholder="Movitel (86/87)" class="flex-1 p-4 rounded-xl bg-v-card border border-white/10 outline-none text-sm text-white">
+                <input type="number" id="reg-age" placeholder="Âge" class="w-20 p-4 rounded-xl bg-v-card border border-white/10 outline-none text-sm text-white">
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="reg-code" placeholder="CODE (ex: L.NG)" class="flex-1 p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none text-sm font-bold text-v-accent uppercase text-center">
+                <input type="password" id="reg-pin" placeholder="PIN" class="w-24 p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none text-sm text-white text-center">
+            </div>
+            <button onclick="checkRegistration()" class="w-full p-4 bg-v-accent text-black font-extrabold rounded-xl shadow-lg active:scale-95 transition text-sm">CRÉER MON COMPTE</button>
+            <p class="text-center text-[10px] text-gray-500 mt-4">Déjà membre ? <span onclick="toggleAuth('login')" class="text-v-accent cursor-pointer underline">Se connecter</span></p>
+        </div>
+
+        <div id="form-login" class="space-y-4 hidden">
+            <input type="text" id="log-code" placeholder="VOTRE CODE" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none text-xl font-black text-v-accent text-center uppercase">
+            <input type="password" id="log-pin" placeholder="PIN SECRET" class="w-full p-4 rounded-xl bg-v-card border border-white/10 outline-none text-center text-white">
+            <button onclick="finalizeAuth('login')" class="w-full p-4 bg-white text-black font-extrabold rounded-xl active:scale-95 transition text-sm uppercase">Accéder au Terminal</button>
+            <p class="text-center text-[10px] text-gray-500 mt-4" onclick="toggleAuth('register')">Retour à l'inscription</p>
+        </div>
+    </div>
+
+    <div id="v-rules" class="fixed inset-0 bg-v-bg z-[6000] p-6 hidden flex-col justify-center items-center text-center">
+        <div class="glass-card p-8 rounded-3xl border border-v-accent/30 max-w-sm">
+            <i class="fas fa-shield-alt text-4xl text-v-accent mb-4"></i>
+            <h2 class="text-2xl font-black italic mb-4">RÈGLES VANGUARD</h2>
+            <div class="text-left text-[11px] space-y-3 text-gray-300 mb-8">
+                <p>● <span class="text-white font-bold">RETRAIT NIVEAU 1 :</span> Dès 20$ (1280 MT). Limite : 200 MT max.</p>
+                <p>● <span class="text-white font-bold">RETRAIT NIVEAU 2 :</span> Dès 50$ (3200 MT). Retrait total autorisé. <span class="text-v-accent font-bold">OBLIGATION de redéposer 640 MT avant 12h.</span></p>
+                <p>● <span class="text-white font-bold">BONUS :</span> Un bonus de 20$ (1280 MT) est offert dès 80$ de solde.</p>
+                <p>● <span class="text-white font-bold">RESPONSABILITÉ :</span> Vous êtes l'unique responsable de votre compte e-Mola.</p>
+            </div>
+            <button onclick="finalizeAuth('register')" class="w-full p-4 bg-v-accent text-black font-black rounded-xl uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(0,255,133,0.3)]">J'accepte et je commence</button>
+        </div>
+    </div>
+
+    <div class="container max-w-[450px] mx-auto p-5 pb-24">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-light">Compte <span class="font-bold text-v-accent current-user-code">--</span></h1>
+            <div class="text-[0.6rem] font-bold text-v-accent bg-[rgba(0,255,133,0.1)] px-3 py-1 rounded-full border border-v-accent animate-pulse">● IA LIVE</div>
+        </div>
+
+        <div id="v-dash" class="view active">
+            <div class="glass-card p-6 rounded-3xl mb-6">
+                <div class="flex justify-between items-start mb-2">
+                    <small class="text-gray-400 block uppercase tracking-widest text-[8px]">Index de Trading Live (MT)</small>
+                    <div class="text-[9px] text-v-accent font-mono italic">1 USD = 64.00 MT</div>
+                </div>
+                <div id="display-bal" class="text-4xl font-extrabold transition-all">0.00 <span class="text-v-accent text-base ml-1">MT</span></div>
+                
+                <div id="main-chart" class="mt-4 min-h-[150px]"></div>
+            </div>
+            
+            <h2 class="text-sm font-bold uppercase tracking-tighter italic mb-4 px-1">Flux Clients</h2>
+            <div class="glass-card p-4 rounded-2xl">
+                <table class="w-full text-xs">
+                    <tbody id="user-trans-list" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="v-ret" class="view">
+            <div class="glass-card p-6 rounded-3xl">
+                <h2 class="text-xl font-bold mb-1 italic text-center uppercase">Retrait</h2>
+                <p class="text-[9px] text-gray-500 text-center mb-6 font-bold tracking-widest">SESSION : <span class="current-user-code text-v-accent">--</span></p>
+                <div class="space-y-4">
+                    <input type="number" id="in-ret-amt" placeholder="Montant MT" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none text-sm">
+                    <input type="number" id="in-ret-num" placeholder="Numéro e-Mola" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none text-sm">
+                    <input type="password" id="retrait-pin-confirm" placeholder="CONFIRMER PIN" class="w-full p-4 rounded-xl bg-v-accent/5 border border-v-accent/20 text-v-accent outline-none text-center font-bold text-xl">
+                    <button class="w-full p-4 bg-v-accent text-black font-extrabold rounded-xl active:scale-95 transition uppercase text-sm" onclick="handleWithdrawal()">Lancer le Retrait</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-depo" class="view">
+            <div class="glass-card p-6 rounded-3xl border border-v-accent/20">
+                <h2 class="text-xl font-bold text-v-accent italic mb-4 uppercase">Recharge</h2>
+                <p class="text-[10px] text-gray-400 mb-6 italic">Versement e-Mola vers le compte agent <b>300032</b></p>
+                <input type="number" id="in-depo-amt" placeholder="Montant MT" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none mb-3 text-sm">
+                <textarea id="in-depo-sms" placeholder="Collez ici le SMS de confirmation e-Mola..." class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-[9px] text-gray-300 outline-none h-24 mb-4"></textarea>
+                <button class="w-full p-4 bg-v-accent text-black font-bold rounded-xl shadow-lg active:scale-95 transition uppercase text-sm" onclick="validateSmartDeposit()">Valider le Dépôt</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-5 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] glass-card rounded-3xl p-3 flex justify-around items-center z-[100] border border-white/10 shadow-2xl">
+        <div class="nav-item active text-v-accent text-xl cursor-pointer p-2" onclick="showView('v-dash', this)"><i class="fas fa-chart-line"></i></div>
+        <div class="nav-item text-gray-500 text-xl cursor-pointer p-2" onclick="showView('v-depo', this)"><i class="fas fa-plus-circle"></i></div>
+        <div class="nav-item text-gray-500 text-xl cursor-pointer p-2" onclick="showView('v-ret', this)"><i class="fas fa-wallet"></i></div>
+    </div>
+
+    <script>
+        const usdRate = 64.00;
+        const clientCodes = ["I.C", "L.NG", "B.G", "M.YV", "X.K"];
+        let currentUser = null;
+        let clients = JSON.parse(localStorage.getItem('v-clients-v4-1')) || {};
+        let chart;
+
+        // Création des clients virtuels (pour les graphiques)
+        if (Object.keys(clients).length === 0) {
+            clientCodes.forEach(code => {
+                clients[code] = {
+                    code: code,
+                    balance: Math.random() * 2000 + 1000,
+                    secret: "1234"
+                };
+            });
+        }
+
+        window.onload = () => {
+            setTimeout(() => { 
+                document.getElementById('splash').style.opacity = '0'; 
+                setTimeout(() => document.getElementById('splash').style.display = 'none', 800); 
+            }, 2000);
+            initChart();
+            startLiveTrading();
+        };
+
+        function toggleAuth(mode) {
+            document.getElementById('form-register').classList.toggle('hidden', mode === 'login');
+            document.getElementById('form-login').classList.toggle('hidden', mode === 'register');
+        }
+
+        // Étape intermédiaire : Vérification infos avant les règles
+        function checkRegistration() {
+            const age = parseInt(document.getElementById('reg-age').value);
+            const tel = document.getElementById('reg-tel').value;
+            const code = document.getElementById('reg-code').value;
+            const pin = document.getElementById('reg-pin').value;
+
+            if (!age || !tel || !code || !pin) return notify("Veuillez remplir tous les champs.");
+            if (age < 18) return notify("Accès refusé : Moins de 18 ans.");
+            if (!tel.startsWith("86") && !tel.startsWith("87")) return notify("Numéro Movitel (86/87) requis.");
+
+            // Afficher les règles
+            document.getElementById('v-rules').classList.remove('hidden');
+            document.getElementById('v-rules').classList.add('flex');
+        }
+
+        function finalizeAuth(mode) {
+            const codeInput = document.getElementById(mode === 'register' ? 'reg-code' : 'log-code');
+            const pinInput = document.getElementById(mode === 'register' ? 'reg-pin' : 'log-pin');
+            const code = codeInput.value.toUpperCase();
+            const pin = pinInput.value;
+
+            if (mode === 'register') {
+                clients[code] = { 
+                    code, 
+                    tel: document.getElementById('reg-tel').value, 
+                    balance: 640.00, // Bonus départ
+                    secret: pin 
+                };
+                document.getElementById('v-rules').classList.add('hidden');
+            } else {
+                if(!clients[code] || clients[code].secret !== pin) return notify("Identifiants incorrects.");
+            }
+
+            currentUser = code;
+            document.getElementById('v-auth').style.display = 'none';
+            document.querySelectorAll('.current-user-code').forEach(el => el.innerText = currentUser);
+            updateUI();
+        }
+
+        function updateUI(activeCode = null, variation = 0) {
+            let html = "";
+            clientCodes.forEach(code => {
+                const c = clients[code];
+                const isMe = code === currentUser;
+                html += `
+                    <tr>
+                        <td class="py-3 font-bold ${isMe ? 'text-v-accent' : 'text-white'}">${code}</td>
+                        <td class="py-3 text-center font-mono ${code === activeCode ? (variation > 0 ? 'pulse-up' : 'pulse-down') : ''}">
+                            ${c.balance.toFixed(2)} MT
+                        </td>
+                        <td class="py-3 text-right text-[10px] text-gray-500">${(c.balance/usdRate).toFixed(2)} $</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('user-trans-list').innerHTML = html;
+            if(currentUser) document.getElementById('display-bal').innerText = clients[currentUser].balance.toLocaleString();
+            localStorage.setItem('v-clients-v4-1', JSON.stringify(clients));
+        }
+
+        function startLiveTrading() {
+            setInterval(() => {
+                for(let i=0; i<3; i++) { // 3 clients bougent en même temps
+                    const code = clientCodes[Math.floor(Math.random() * clientCodes.length)];
+                    const variation = (Math.random() * 40 - 20);
+                    clients[code].balance += variation;
+                    if(clients[code].balance < 0) clients[code].balance = 0;
+                    updateUI(code, variation);
+                }
+                updateChart();
+            }, 3000);
+        }
+
+        function handleWithdrawal() {
+            const amt = parseFloat(document.getElementById('in-ret-amt').value);
+            const num = document.getElementById('in-ret-num').value;
+            const user = clients[currentUser];
+            const balUSD = user.balance / usdRate;
+
+            if (balUSD < 20) return notify("Solde insuffisant (< 20$)");
+            if (balUSD < 50 && amt > 200) return notify("Max 200 MT autorisé.");
+            if (document.getElementById('retrait-pin-confirm').value !== user.secret) return notify("PIN incorrect.");
+
+            user.balance -= amt;
+            notify("Demande de retrait envoyée !");
+            updateUI();
+            showView('v-dash', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        function validateSmartDeposit() {
+            const amt = parseFloat(document.getElementById('in-depo-amt').value);
+            const sms = document.getElementById('in-depo-sms').value;
+            if(sms.includes("300032") && sms.includes(amt.toString())) {
+                clients[currentUser].balance += amt;
+                if(clients[currentUser].balance >= (80 * usdRate)) {
+                    clients[currentUser].balance += (20 * usdRate);
+                    notify("FÉLICITATIONS : BONUS 20$ REÇU !");
+                }
+                updateUI();
+                notify("Dépôt crédité avec succès !");
+                showView('v-dash', document.querySelectorAll('.nav-item')[0]);
+            } else {
+                notify("Erreur : SMS non reconnu.");
+            }
+        }
+
+        function showView(id, el) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'text-v-accent'));
+            el.classList.add('active', 'text-v-accent');
+        }
+
+        function notify(text) {
+            const t = document.getElementById('toast');
+            t.innerText = text; t.style.top = '20px';
+            setTimeout(() => t.style.top = '-64px', 3000);
+        }
+
+        function initChart() {
+            const series = clientCodes.map(code => ({ name: code, data: [clients[code].balance] }));
+            chart = new ApexCharts(document.querySelector("#main-chart"), {
+                series: series,
+                chart: { height: 180, type: 'line', toolbar: {show:false}, animations: {enabled:true} },
+                colors: ['#00ff85', '#3b82f6', '#ff4d4d', '#f59e0b', '#ffffff'],
+                stroke: { curve: 'smooth', width: 2 },
+                xaxis: { labels: {show:false} },
+                yaxis: { labels: {show:false} },
+                grid: { borderColor: 'rgba(255,255,255,0.05)' },
+                legend: { show: false }
+            });
+            chart.render();
+        }
+
+        function updateChart() {
+            const newSeries = clientCodes.map(code => {
+                const currentData = chart.w.config.series.find(s => s.name === code).data;
+                if(currentData.length > 12) currentData.shift();
+                return { name: code, data: [...currentData, clients[code].balance] };
+            });
+            chart.updateSeries(newSeries);
+        }
+    </script>
+</body>
+</html>
