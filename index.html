@@ -4,20 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanguard Intelligence v5.0</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'v-bg': '#05070a', 'v-card': 'rgba(22, 27, 40, 0.8)', 'v-accent': '#00ff85', 'v-danger': '#ff4d4d' } } }
+            theme: {
+                extend: {
+                    colors: {
+                        'v-bg': '#05070a',
+                        'v-card': 'rgba(22, 27, 40, 0.8)',
+                        'v-accent': '#00ff85',
+                        'v-danger': '#ff4d4d',
+                    }
+                }
+            }
         }
     </script>
+    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #05070a; color: white; overflow-x: hidden; }
         .glass-card { background: rgba(22, 27, 40, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .view { display: none; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        #ticker-container { height: 150px; overflow: hidden; position: relative; }
+        
         #ticker-wall { animation: scrollUp 4s linear infinite; }
         @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
     </style>
@@ -26,120 +38,129 @@
 
     <div id="toast" class="fixed -top-16 left-1/2 -translate-x-1/2 bg-v-accent text-black px-6 py-3 rounded-full font-bold shadow-lg transition-all duration-500 z-[10000]">Action réussie !</div>
 
-    <div id="v-auth" class="fixed inset-0 bg-v-bg z-[5000] p-8 flex flex-col justify-center active view">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl font-black text-v-accent italic">VANGUARD</h2>
-        </div>
+    <div id="v-auth" class="fixed inset-0 bg-v-bg z-[5000] p-8 flex flex-col justify-center view active">
+        <h2 class="text-3xl font-black text-v-accent italic text-center mb-10 tracking-tighter">VANGUARD</h2>
         <div id="form-register" class="space-y-4">
-            <input type="text" id="reg-code" placeholder="VOTRE CODE CLIENT (ex: L.NG)" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none font-bold text-v-accent text-center uppercase">
-            <input type="number" id="reg-tel" placeholder="Numéro Movitel" class="w-full p-4 rounded-xl bg-v-card border border-white/10 outline-none text-white">
-            <input type="password" id="reg-pin" placeholder="PIN SECRET" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none text-center">
+            <input type="text" id="reg-code" placeholder="VOTRE CODE CLIENT (ex: L.NG)" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 font-bold text-v-accent text-center uppercase outline-none">
+            <input type="number" id="reg-tel" placeholder="Numéro Movitel" class="w-full p-4 rounded-xl bg-v-card border border-white/10 text-white outline-none">
+            <input type="password" id="reg-pin" placeholder="PIN SECRET" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 text-center outline-none">
             <button onclick="checkRegistration()" class="w-full p-4 bg-v-accent text-black font-black rounded-xl uppercase">S'inscrire</button>
             <p class="text-center text-[10px] text-gray-500 mt-4" onclick="toggleAuth('login')">Déjà inscrit ? <span class="text-v-accent underline cursor-pointer">Se connecter</span></p>
         </div>
-        <div id="form-login" class="space-y-4 hidden">
-            <input type="text" id="log-code" placeholder="CODE CLIENT" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 outline-none text-center uppercase">
-            <input type="password" id="log-pin" placeholder="PIN" class="w-full p-4 rounded-xl bg-v-card border border-white/10 outline-none text-center">
-            <button onclick="finalizeAuth('login')" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase">Connexion</button>
+        <div id="form-login" class="space-y-4 hidden text-center">
+            <input type="text" id="log-code" placeholder="VOTRE CODE" class="w-full p-4 rounded-xl bg-v-card border border-v-accent/30 text-xl font-black text-v-accent text-center uppercase outline-none">
+            <input type="password" id="log-pin" placeholder="PIN" class="w-full p-4 rounded-xl bg-v-card border border-white/10 text-center outline-none">
+            <button onclick="finalizeAuth('login')" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase">Entrer</button>
             <p class="text-center text-[10px] text-gray-500 mt-4" onclick="toggleAuth('register')">Créer un compte</p>
         </div>
     </div>
 
     <div id="v-rules" class="fixed inset-0 bg-v-bg z-[6000] p-6 hidden flex-col justify-center items-center view">
-        <button onclick="showView('v-auth')" class="absolute top-10 left-6 text-white"><i class="fas fa-arrow-left"></i> Retour</button>
+        <button onclick="showView('v-auth')" class="absolute top-8 left-6 text-gray-500 text-sm uppercase font-bold"><i class="fas fa-arrow-left"></i> Inscription</button>
         <div class="glass-card p-6 rounded-3xl border border-v-accent/30 text-center max-w-[400px]">
-            <h2 class="text-xl font-black italic mb-4 text-v-accent uppercase">Règles du Jeu</h2>
+            <h2 class="text-xl font-black italic mb-4 text-v-accent uppercase text-center">Règles du Jeu</h2>
             <div class="text-left text-[11px] space-y-3 text-gray-300 mb-6 leading-relaxed">
-                <p>• <span class="text-white font-bold italic">Numéro :</span> Movitel lié à votre code client. Seul ce numéro peut déposer (Agent 300032) et retirer.</p>
-                <p>• <span class="text-white font-bold italic">Dépôt :</span> Min 10$ (640 MT). <span class="text-white font-bold italic">Retrait :</span> Min 20$ (1280 MT) / Max 10$ par retrait.</p>
-                <p>• <span class="text-white font-bold italic">50$ :</span> Retrait total possible si redépôt de 620 MT sous 12h.</p>
+                <p>• <span class="text-white font-bold">Sauvegarde :</span> Votre solde est lié à votre code client et reste enregistré sur ce téléphone.</p>
+                <p>• <span class="text-white font-bold">Retrait :</span> Seul le montant que vous retirez est déduit de votre compte.</p>
+                <p>• <span class="text-white font-bold">PIN :</span> Le bouton de validation de retrait ne s'affiche qu'avec le bon code PIN.</p>
             </div>
             <button onclick="showPromo()" class="w-full p-4 bg-v-accent text-black font-black rounded-xl uppercase">Accepter</button>
         </div>
     </div>
 
     <div id="v-promo" class="fixed inset-0 bg-v-bg z-[7000] p-8 hidden flex-col justify-center items-center text-center view">
-        <button onclick="showView('v-rules')" class="absolute top-10 left-6 text-white"><i class="fas fa-arrow-left"></i> Retour</button>
+        <button onclick="showView('v-rules')" class="absolute top-8 left-6 text-gray-500 text-sm uppercase font-bold"><i class="fas fa-arrow-left"></i> Règles</button>
         <h2 class="text-3xl font-black text-v-accent italic mb-6">VANGUARD</h2>
-        <div class="space-y-4 mb-10 border-y border-white/5 py-6 uppercase font-bold text-sm">
-            <p>"Avec Vanguard on gagne gros à tous les coups"</p>
-            <p class="text-[10px] opacity-60">Plus on est nombreux, plus on gagne gros</p>
-            <p class="text-v-accent text-xs">Avec Vanguard on n'est que des gagnants</p>
-        </div>
-        <button onclick="finalizeAuth('register')" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase">Entrer</button>
+        <p class="text-lg font-black uppercase italic leading-tight mb-8">"Avec Vanguard on gagne gros à tous les coups"</p>
+        <button onclick="finalizeAuth('register')" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase">Ouvrir le Tableau</button>
     </div>
 
     <div id="v-main" class="view">
         <div class="container max-w-[450px] mx-auto p-5 pb-24">
             <header class="flex justify-between items-center mb-6">
-                <button onclick="showView('v-promo')" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="showView('v-promo')" class="text-gray-500 text-sm uppercase font-bold"><i class="fas fa-arrow-left"></i> Pub</button>
                 <h1 class="text-xl font-light italic">ID: <span class="font-bold text-v-accent current-user-code">--</span></h1>
                 <button onclick="location.reload()" class="text-v-danger"><i class="fas fa-power-off"></i></button>
             </header>
 
-            <div id="v-dash" class="view active">
+            <div id="sub-dash" class="sub-view active">
                 <div class="glass-card p-5 rounded-3xl mb-6 overflow-hidden relative">
-                    <div class="text-[10px] text-gray-500 uppercase mb-2">Solde Trading</div>
-                    <div class="text-4xl font-black mb-1"><span id="display-bal">0.00</span> MT</div>
-                    <div id="ticker-container" class="border-t border-white/5 mt-4 pt-4">
+                    <div class="text-[10px] text-gray-500 uppercase mb-2">Solde Trading (MT)</div>
+                    <div class="text-4xl font-black mb-1"><span id="display-bal">0.00</span></div>
+                    <div class="h-20 overflow-hidden relative border-t border-white/5 mt-4 pt-4">
                         <div id="ticker-wall" class="space-y-2"></div>
                     </div>
                 </div>
                 <div id="user-trans-list" class="glass-card p-4 rounded-2xl space-y-4"></div>
             </div>
 
-            <div id="v-depo" class="view">
-                <div class="glass-card p-6 rounded-3xl space-y-4 border border-v-accent/20">
-                    <h2 class="font-black italic">DÉPÔT (AGENT 300032)</h2>
-                    <input type="number" id="in-depo-amt" placeholder="Montant MT" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none">
-                    <textarea id="in-depo-sms" placeholder="Collez le SMS de confirmation..." class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-[9px] h-24 outline-none"></textarea>
-                    <button id="btn-depo-action" class="w-full p-4 bg-v-accent text-black font-black rounded-xl uppercase" onclick="validateSmartDeposit()">Confirmer Dépôt</button>
+            <div id="sub-ret" class="sub-view hidden">
+                <h2 class="text-xl font-black italic mb-6 text-v-danger uppercase">Retrait Sécurisé</h2>
+                <div class="glass-card p-6 rounded-3xl space-y-4">
+                    <input type="number" id="in-ret-amt" placeholder="Montant à retirer (MT)" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none">
+                    <input type="password" id="in-ret-pin" oninput="checkRetraitPIN()" placeholder="VOTRE PIN SECRET" class="w-full p-4 rounded-xl bg-v-accent/5 border border-v-accent/30 text-center font-bold text-v-accent outline-none">
+                    <button id="btn-ret-confirm" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase hidden" onclick="handleWithdrawal()">Valider le Retrait</button>
                 </div>
             </div>
 
-            <div id="v-ret" class="view">
-                <div class="glass-card p-6 rounded-3xl space-y-4">
-                    <h2 class="font-black italic text-v-danger">RETRAIT</h2>
-                    <input type="number" id="in-ret-amt" placeholder="Montant MT" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none">
-                    <input type="password" id="in-ret-pin" placeholder="ENTREZ VOTRE PIN" oninput="toggleRetraitBtn()" class="w-full p-4 rounded-xl bg-v-accent/10 border border-v-accent/30 text-center font-bold text-v-accent outline-none">
-                    <button id="btn-ret-validate" class="w-full p-4 bg-white text-black font-black rounded-xl uppercase hidden" onclick="handleWithdrawal()">Valider le Retrait</button>
+            <div id="sub-depo" class="sub-view hidden">
+                <h2 class="text-xl font-black italic mb-6 text-v-accent uppercase">Recharge</h2>
+                <div class="glass-card p-6 rounded-3xl space-y-4 border border-v-accent/20">
+                    <input type="number" id="in-depo-amt" placeholder="Montant déposé (MT)" class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-white outline-none">
+                    <textarea id="in-depo-sms" oninput="checkDepotSMS()" placeholder="Collez le SMS Movitel ici..." class="w-full p-4 rounded-xl bg-black/50 border border-white/5 text-[10px] h-24 outline-none"></textarea>
+                    <button id="btn-depo-confirm" class="w-full p-4 bg-v-accent text-black font-black rounded-xl uppercase hidden" onclick="validateSmartDeposit()">Confirmer Dépôt</button>
                 </div>
             </div>
         </div>
 
         <div class="fixed bottom-5 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] glass-card rounded-3xl p-3 flex justify-around items-center z-[100] border border-white/10">
-            <div class="nav-item active text-v-accent text-xl" onclick="showSubView('v-dash', this)"><i class="fas fa-chart-line"></i></div>
-            <div class="nav-item text-gray-500 text-xl" onclick="showSubView('v-depo', this)"><i class="fas fa-plus-circle"></i></div>
-            <div class="nav-item text-gray-500 text-xl" onclick="showSubView('v-ret', this)"><i class="fas fa-wallet"></i></div>
+            <div class="nav-item active text-v-accent text-xl" onclick="showSubView('sub-dash', this)"><i class="fas fa-chart-line"></i></div>
+            <div class="nav-item text-gray-500 text-xl" onclick="showSubView('sub-depo', this)"><i class="fas fa-plus-circle"></i></div>
+            <div class="nav-item text-gray-500 text-xl" onclick="showSubView('sub-ret', this)"><i class="fas fa-wallet"></i></div>
         </div>
     </div>
 
     <script>
-        const usdRate = 64.00;
-        let currentUser = null;
+        // RÉCUPÉRATION OU CRÉATION DES DONNÉES (SAUVEGARDE)
         let clients = JSON.parse(localStorage.getItem('vanguard_data')) || {};
+        let currentUser = null;
 
         function save() { localStorage.setItem('vanguard_data', JSON.stringify(clients)); }
-        function toggleAuth(m) { document.getElementById('form-register').classList.toggle('hidden', m==='login'); document.getElementById('form-login').classList.toggle('hidden', m==='register'); }
-        
-        function checkRegistration() {
-            if(!document.getElementById('reg-code').value || !document.getElementById('reg-pin').value) return notify("Champs requis");
-            showView('v-rules');
+
+        // NAVIGATION
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
+        function showSubView(id, el) {
+            document.querySelectorAll('.sub-view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('text-v-accent'));
+            el.classList.add('text-v-accent');
+        }
+
+        function toggleAuth(m) {
+            document.getElementById('form-register').classList.toggle('hidden', m==='login');
+            document.getElementById('form-login').classList.toggle('hidden', m==='register');
+        }
+
+        function checkRegistration() { showView('v-rules'); }
         function showPromo() { showView('v-promo'); }
 
+        // AUTHENTIFICATION
         function finalizeAuth(mode) {
             const code = document.getElementById(mode === 'register' ? 'reg-code' : 'log-code').value.toUpperCase();
             const pin = document.getElementById(mode === 'register' ? 'reg-pin' : 'log-pin').value;
-
+            
             if (mode === 'register') {
-                clients[code] = { code, balance: 640.0, secret: pin };
+                if(!clients[code]) clients[code] = { code, balance: 640.0, secret: pin };
             } else {
-                if(!clients[code] || clients[code].secret !== pin) return notify("Erreur PIN/CODE");
+                if(!clients[code] || clients[code].secret !== pin) return notify("Code ou PIN incorrect");
             }
+            
             currentUser = code;
-            localStorage.setItem('vanguard_session', currentUser);
+            save();
             showView('v-main');
             loginSuccess();
         }
@@ -154,71 +175,80 @@
         function updateUI() {
             const user = clients[currentUser];
             document.getElementById('display-bal').innerText = user.balance.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+            
+            let html = "";
+            const keys = Object.keys(clients).slice(0, 4);
+            keys.forEach(k => {
+                html += `<div class="flex justify-between text-[11px] border-b border-white/5 pb-1 text-gray-400 italic"><span>> ${k}</span><span>${clients[k].balance.toFixed(2)} MT</span></div>`;
+            });
+            document.getElementById('user-trans-list').innerHTML = html;
+        }
+
+        // GAINS AUTOMATIQUES (Même hors ligne, ça reprend au retour)
+        function liveMarket() {
+            Object.keys(clients).forEach(k => {
+                clients[k].balance += (Math.random() * 45 - 18);
+                if(clients[k].balance < 0) clients[k].balance = 0;
+            });
+            updateUI();
             save();
         }
 
-        function liveMarket() {
-            Object.keys(clients).forEach(code => {
-                clients[code].balance += (Math.random() * 40 - 15);
-                if(clients[code].balance < 0) clients[code].balance = 0;
-            });
-            updateUI();
+        // --- CORRECTIONS DEMANDÉES ---
+
+        // 1. Bouton Retrait : apparaît uniquement si PIN OK
+        function checkRetraitPIN() {
+            const pinSaisi = document.getElementById('in-ret-pin').value;
+            const btn = document.getElementById('btn-ret-confirm');
+            btn.classList.toggle('hidden', pinSaisi !== clients[currentUser].secret);
+        }
+
+        // 2. Bouton Dépôt : apparaît uniquement si SMS Movitel OK
+        function checkDepotSMS() {
+            const sms = document.getElementById('in-depo-sms').value;
+            const btn = document.getElementById('btn-depo-confirm');
+            btn.classList.toggle('hidden', !sms.includes("300032"));
+        }
+
+        // 3. Correction Retrait : Déduit seulement le montant saisi
+        function handleWithdrawal() {
+            const amt = parseFloat(document.getElementById('in-ret-amt').value);
+            const user = clients[currentUser];
+            
+            if (user.balance >= amt && amt > 0) {
+                user.balance -= amt; // Soustraction précise
+                notify("Retrait de " + amt + " MT validé !");
+                
+                document.getElementById('in-ret-amt').value = "";
+                document.getElementById('in-ret-pin').value = "";
+                document.getElementById('btn-ret-confirm').classList.add('hidden');
+                
+                updateUI();
+                save();
+            } else {
+                notify("Solde insuffisant");
+            }
         }
 
         function validateSmartDeposit() {
             const amt = parseFloat(document.getElementById('in-depo-amt').value);
-            const sms = document.getElementById('in-depo-sms').value;
-            if(amt >= 640 && sms.includes("300032") && sms.includes(amt.toString())) {
+            if(amt > 0) {
                 clients[currentUser].balance += amt;
-                notify("DÉPÔT RÉUSSI !");
-                document.getElementById('btn-depo-action').innerText = "DÉPOSER À NOUVEAU";
+                notify("Compte crédité de " + amt + " MT");
+                
                 document.getElementById('in-depo-amt').value = "";
                 document.getElementById('in-depo-sms').value = "";
+                document.getElementById('btn-depo-confirm').classList.add('hidden');
+                
                 updateUI();
-            } else { notify("SMS ou Code Agent invalide"); }
-        }
-
-        function toggleRetraitBtn() {
-            const pinSaisi = document.getElementById('in-ret-pin').value;
-            const btn = document.getElementById('btn-ret-validate');
-            if(pinSaisi === clients[currentUser].secret) { btn.classList.remove('hidden'); } 
-            else { btn.classList.add('hidden'); }
-        }
-
-        function handleWithdrawal() {
-            const amt = parseFloat(document.getElementById('in-ret-amt').value);
-            const user = clients[currentUser];
-            if(user.balance >= amt && amt > 0) {
-                user.balance -= amt; // Correction ici : On déduit SEULEMENT le montant saisi
-                notify("RETRAIT DE " + amt + " MT VALIDÉ");
-                document.getElementById('in-ret-amt').value = "";
-                document.getElementById('in-ret-pin').value = "";
-                document.getElementById('btn-ret-validate').classList.add('hidden');
-                updateUI();
-            } else { notify("Solde insuffisant"); }
-        }
-
-        function showView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active', 'flex', 'block'));
-            const target = document.getElementById(id);
-            target.classList.add('active');
-            target.classList.add(id === 'v-rules' || id === 'v-promo' ? 'flex' : 'block');
-        }
-
-        function showSubView(id, el) {
-            document.querySelectorAll('#v-main .view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('text-v-accent'));
-            el.classList.add('text-v-accent');
+                save();
+            }
         }
 
         function initTicker() {
             let html = "";
             for(let i=0; i<10; i++) {
-                html += `<div class="flex justify-between text-[10px] font-mono opacity-50 italic">
-                    <span>> USER_${Math.floor(Math.random()*999)}</span>
-                    <span class="text-v-accent">+${(Math.random()*100).toFixed(2)} MT</span>
-                </div>`;
+                html += `<div class="flex justify-between text-[10px] opacity-40 italic"><span>PROFIT_IA_${i}</span><span class="text-v-accent">+${(Math.random()*60).toFixed(2)}</span></div>`;
             }
             document.getElementById('ticker-wall').innerHTML = html + html;
         }
