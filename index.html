@@ -30,9 +30,9 @@
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Animation défilement infini */
+        /* Animation accélérée à 8s pour plus de dynamisme */
         #ticker-container { height: 180px; overflow: hidden; position: relative; }
-        #ticker-wall { animation: scrollUp 15s linear infinite; }
+        #ticker-wall { animation: scrollUp 8s linear infinite; }
         @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
         
         .status-up { color: #00ff85; text-shadow: 0 0 5px rgba(0,255,133,0.5); }
@@ -85,21 +85,26 @@
     <div class="container max-w-[450px] mx-auto p-5 pb-24">
         
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-light">ID: <span class="font-bold text-v-accent current-user-code">--</span></h1>
+            <div class="flex items-center gap-3">
+                <button onclick="logout()" class="w-8 h-8 rounded-full bg-v-danger/20 text-v-danger flex items-center justify-center text-xs border border-v-danger/30">
+                    <i class="fas fa-power-off"></i>
+                </button>
+                <h1 class="text-xl font-light">ID: <span class="font-bold text-v-accent current-user-code">--</span></h1>
+            </div>
             <div class="text-[0.6rem] font-bold text-v-accent bg-v-accent/10 px-3 py-1 rounded-full border border-v-accent animate-pulse uppercase">Neural Live</div>
         </header>
 
         <div id="v-dash" class="view active">
             <div class="glass-card p-5 rounded-3xl mb-6 overflow-hidden relative">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center mb-2">
                     <span class="text-[10px] text-gray-500 uppercase tracking-widest">Solde Actuel</span>
                     <span class="text-v-accent font-mono text-[10px]">IA OPTIMIZED</span>
                 </div>
-                <div class="text-4xl font-black mb-6"><span id="display-bal">0.00</span> <small class="text-v-accent text-sm">MT</small></div>
+                <div class="text-3xl font-black"><span id="display-bal">0.00</span> <small class="text-v-accent text-sm">MT</small></div>
+                <div class="text-sm opacity-50 mb-6 italic text-v-accent">≈ <span id="display-bal-usd">0.00</span> $</div>
                 
                 <div id="ticker-container" class="border-t border-white/5 pt-4">
-                    <div id="ticker-wall" class="space-y-2">
-                        </div>
+                    <div id="ticker-wall" class="space-y-2"></div>
                 </div>
             </div>
 
@@ -148,10 +153,10 @@
         const clientCodes = ["I.C", "L.NG", "B.G", "M.YV", "X.K", "V.Z", "R.T", "S.O"];
         let currentUser = null;
         
-        // RECUPERER LES DONNÉES SAUVEGARDÉES (LocalStorage)
+        // Données persistantes
         let clients = JSON.parse(localStorage.getItem('vanguard_data')) || {};
+        let myHistory = JSON.parse(localStorage.getItem('vanguard_history')) || [];
 
-        // Init clients fictifs si vide
         if (Object.keys(clients).length === 0) {
             clientCodes.forEach(code => {
                 clients[code] = { code, balance: Math.random() * 3000 + 1000, secret: "1234" };
@@ -161,10 +166,15 @@
 
         function save() {
             localStorage.setItem('vanguard_data', JSON.stringify(clients));
+            localStorage.setItem('vanguard_history', JSON.stringify(myHistory));
+        }
+
+        function logout() {
+            localStorage.removeItem('vanguard_session');
+            location.reload();
         }
 
         window.onload = () => {
-            // Vérifier si un utilisateur était déjà connecté
             const savedUser = localStorage.getItem('vanguard_session');
             if(savedUser && clients[savedUser]) {
                 currentUser = savedUser;
@@ -183,7 +193,7 @@
         function checkRegistration() {
             const age = parseInt(document.getElementById('reg-age').value);
             const tel = document.getElementById('reg-tel').value;
-            if (age < 18 || !tel.startsWith("86") && !tel.startsWith("87")) {
+            if (age < 18 || (!tel.startsWith("86") && !tel.startsWith("87"))) {
                 return notify("Données invalides (18 ans + Movitel requis)");
             }
             document.getElementById('v-rules').classList.remove('hidden');
@@ -191,8 +201,12 @@
         }
 
         function finalizeAuth(mode) {
-            const code = document.getElementById(mode === 'register' ? 'reg-code' : 'log-code').value.toUpperCase();
-            const pin = document.getElementById(mode === 'register' ? 'reg-pin' : 'log-pin').value;
+            const codeInput = document.getElementById(mode === 'register' ? 'reg-code' : 'log-code');
+            const pinInput = document.getElementById(mode === 'register' ? 'reg-pin' : 'log-pin');
+            const code = codeInput.value.toUpperCase();
+            const pin = pinInput.value;
+
+            if(!code || !pin) return notify("Champs vides");
 
             if (mode === 'register') {
                 clients[code] = { code, balance: 640.0, secret: pin };
@@ -214,15 +228,34 @@
 
         function updateUI() {
             const user = clients[currentUser];
-            document.getElementById('display-bal').innerText = user.balance.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+            const balMT = user.balance;
+            const balUSD = (user.balance / usdRate).toFixed(2);
+
+            document.getElementById('display-bal').innerText = balMT.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+            document.getElementById('display-bal-usd').innerText = balUSD;
             
+            // Nettoyage historique (+ de 20 min)
+            const now = Date.now();
+            myHistory = myHistory.filter(h => (now - h.time) < 20 * 60 * 1000);
+
             let html = "";
-            clientCodes.slice(0, 5).forEach(code => {
+            // Afficher l'historique récent d'abord
+            myHistory.forEach(h => {
+                html += `<div class="flex justify-between items-center text-[11px] border-b border-v-accent/20 pb-2 bg-v-accent/5 p-1 rounded">
+                    <span class="font-bold text-v-accent">${h.type}</span>
+                    <span class="font-mono text-white">${h.amount.toFixed(2)} MT (${(h.amount/usdRate).toFixed(2)}$)</span>
+                    <span class="text-[7px] bg-v-accent text-black px-1 rounded font-black">RÉCENT</span>
+                </div>`;
+            });
+
+            // Reste de la liste fictive
+            clientCodes.slice(0, 4).forEach(code => {
+                if(code === currentUser) return;
                 const c = clients[code];
                 html += `<div class="flex justify-between items-center text-[11px] border-b border-white/5 pb-2">
-                    <span class="font-bold">${code}</span>
-                    <span class="font-mono">${c.balance.toFixed(2)} MT</span>
-                    <span class="text-v-accent text-[8px] bg-v-accent/5 px-2 rounded">ONLINE</span>
+                    <span class="font-bold text-gray-400">${code}</span>
+                    <span class="font-mono">${c.balance.toFixed(2)} MT <small class="opacity-40">(${(c.balance/usdRate).toFixed(2)})</small></span>
+                    <span class="text-v-accent text-[8px] bg-v-accent/5 px-2 rounded">LIVE</span>
                 </div>`;
             });
             document.getElementById('user-trans-list').innerHTML = html;
@@ -231,15 +264,14 @@
 
         function initTicker() {
             let html = "";
-            // On crée une liste double pour le défilement infini
-            const list = [...clientCodes, ...clientCodes];
+            const list = [...clientCodes, ...clientCodes, ...clientCodes];
             list.forEach(code => {
-                const profit = (Math.random() * 100).toFixed(2);
+                const profit = (Math.random() * 50).toFixed(2);
                 const isUp = Math.random() > 0.4;
                 html += `<div class="flex justify-between items-center text-[10px] font-mono p-1">
                     <span class="text-gray-500">> ${code}</span>
                     <span class="${isUp ? 'status-up' : 'status-down'}">${isUp ? '+' : '-'}${profit} MT</span>
-                    <span class="opacity-30">SIGNAL_IA_${Math.floor(Math.random()*999)}</span>
+                    <span class="opacity-30">VNG_${Math.floor(Math.random()*99)}</span>
                 </div>`;
             });
             document.getElementById('ticker-wall').innerHTML = html;
@@ -247,26 +279,23 @@
 
         function startLiveUpdates() {
             setInterval(() => {
-                // Mise à jour du solde du client fictif
                 const code = clientCodes[Math.floor(Math.random() * clientCodes.length)];
-                clients[code].balance += (Math.random() * 10 - 5);
-                if(code === currentUser) updateUI();
-                
-                // Ajouter un clignotement aléatoire sur le ticker
-                const tickerItems = document.querySelectorAll('#ticker-wall div');
-                const randomItem = tickerItems[Math.floor(Math.random()*tickerItems.length)];
-                randomItem.style.background = "rgba(255,255,255,0.05)";
-                setTimeout(() => randomItem.style.background = "transparent", 500);
-            }, 2000);
+                if(clients[code]) {
+                    clients[code].balance += (Math.random() * 10 - 5);
+                    if(code === currentUser) updateUI();
+                }
+            }, 3000);
         }
 
         function handleWithdrawal() {
             const amt = parseFloat(document.getElementById('in-ret-amt').value);
             const user = clients[currentUser];
+            if (!amt || amt <= 0) return notify("Montant invalide");
             if (user.balance < (20 * usdRate)) return notify("Solde insuffisant (Min 20$)");
             if (user.balance < (50 * usdRate) && amt > 200) return notify("Limite 200 MT");
             
             user.balance -= amt;
+            myHistory.unshift({ type: 'RETRAIT', amount: amt, time: Date.now() });
             notify("Retrait validé !");
             updateUI();
             goBack();
@@ -275,14 +304,18 @@
         function validateSmartDeposit() {
             const amt = parseFloat(document.getElementById('in-depo-amt').value);
             const sms = document.getElementById('in-depo-sms').value;
-            if(sms.includes("300032") && sms.includes(amt.toString())) {
+            if(amt > 0 && sms.includes("300032") && sms.includes(amt.toString())) {
                 clients[currentUser].balance += amt;
-                if(clients[currentUser].balance >= 80*usdRate) clients[currentUser].balance += 20*usdRate;
+                if(clients[currentUser].balance >= 80*usdRate) {
+                    clients[currentUser].balance += 20*usdRate;
+                    notify("Bonus 20$ Appliqué !");
+                }
+                myHistory.unshift({ type: 'DÉPÔT', amount: amt, time: Date.now() });
                 updateUI();
                 notify("Dépôt crédité !");
                 goBack();
             } else {
-                notify("SMS non valide");
+                notify("SMS ou Montant non valide");
             }
         }
 
@@ -307,4 +340,4 @@
     </script>
 </body>
                 </html>
-    
+                
