@@ -5,29 +5,20 @@
     <title>Vanguard Intelligence v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'v-bg': '#080c14', 'v-card': 'rgba(15, 22, 36, 0.9)', 'v-accent': '#00ff85', 'v-danger': '#ff4d4d', 'v-surface': '#161b28' } } } }
-    </script>
+    <script>tailwind.config={theme:{extend:{colors:{'v-bg':'#080c14','v-card':'rgba(15, 22, 36, 0.9)','v-accent':'#00ff85','v-danger':'#ff4d4d','v-surface':'#161b28'}}}}</script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top right, #1a2a44, #080c14); color: white; overflow-x: hidden; min-height: 100vh; }
-        .glass-card { background: linear-gradient(145deg, rgba(22, 27, 40, 0.9), rgba(15, 22, 36, 0.95)); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn-primary { background: linear-gradient(90deg, #00ff85, #00d971); box-shadow: 0 0 20px rgba(0, 255, 133, 0.3); transition: all 0.3s ease; }
-        .btn-primary:active { transform: scale(0.95); opacity: 0.9; }
-        .view { display: none; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .view.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        #ticker-wall { animation: scrollUp 12s linear infinite; }
-        @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        .input-v { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
-        .input-v:focus { border-color: #00ff85; outline: none; }
-        ::-webkit-scrollbar { width: 0px; }
+        body{font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(circle at top right,#1a2a44,#080c14);color:white;overflow-x:hidden;min-height:100vh;}
+        .glass-card{background:linear-gradient(145deg,rgba(22,27,40,0.9),rgba(15,22,36,0.95));backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+        .btn-primary{background:linear-gradient(90deg,#00ff85,#00d971);box-shadow:0 0 20px rgba(0,255,133,0.3);transition:all 0.3s ease;}
+        .view{display:none;animation:slideUp 0.4s cubic-bezier(0.4,0,0.2,1);}.view.active{display:block;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        #ticker-wall{animation:scrollUp 12s linear infinite;}@keyframes scrollUp{0%{transform:translateY(0);}100%{transform:translateY(-50%);}}
+        .input-v{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);transition:all 0.3s;}.input-v:focus{border-color:#00ff85;outline:none;}
     </style>
 </head>
 <body>
-    <div id="toast" class="fixed -top-16 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-3 rounded-2xl font-bold shadow-2xl transition-all duration-500 z-[10000] flex items-center gap-2">
-        <i class="fas fa-bolt text-v-accent"></i><span id="toast-text">Action réussie !</span>
-    </div>
+    <div id="toast" class="fixed -top-16 left-1/2 -translate-x-1/2 bg-white text-black px-8 py-3 rounded-2xl font-bold shadow-2xl transition-all duration-500 z-[10000] flex items-center gap-2"><i class="fas fa-bolt text-v-accent"></i><span id="toast-text">Action réussie !</span></div>
 
     <div id="v-auth" class="fixed inset-0 bg-v-bg z-[5000] p-8 flex flex-col justify-center">
         <div class="text-center mb-10"><div class="inline-block p-4 rounded-3xl bg-v-accent/10 mb-4 border border-v-accent/20"><i class="fas fa-microchip text-v-accent text-4xl animate-pulse"></i></div><h2 class="text-4xl font-extrabold tracking-tighter uppercase italic">Vanguard</h2><p class="text-gray-500 text-[10px] uppercase tracking-[0.4em] mt-2">IA Trading Mobile Terminal</p></div>
@@ -48,40 +39,28 @@
     </div>
 
     <div id="v-rules" class="fixed inset-0 bg-black/95 z-[6000] p-6 hidden flex-col justify-center items-center">
-        <div class="glass-card p-8 rounded-[2.5rem] text-center max-w-[400px] border-v-accent/30">
-            <h2 class="text-2xl font-extrabold mb-6 italic uppercase">Protocole Vanguard</h2>
-            <div class="text-left text-[11px] space-y-4 text-gray-400 mb-8"><p><i class="fas fa-shield text-v-accent mr-2"></i><b>Âge :</b> 18 ans requis.</p><p><i class="fas fa-bolt text-v-accent mr-2"></i><b>Dépôt :</b> Code agent <span class="underline">300032</span>.</p><p><i class="fas fa-wallet text-v-accent mr-2"></i><b>Retrait :</b> Min 20$, Max 10$ si solde < 50$.</p></div>
-            <button onclick="showPromo()" class="btn-primary w-full p-5 text-black font-bold rounded-2xl uppercase">Accepter</button>
-        </div>
+        <div class="glass-card p-8 rounded-[2.5rem] text-center max-w-[400px] border-v-accent/30"><h2 class="text-2xl font-extrabold mb-6 italic uppercase">Protocole Vanguard</h2><div class="text-left text-[11px] space-y-4 text-gray-400 mb-8"><p><i class="fas fa-shield text-v-accent mr-2"></i><b>Âge :</b> 18 ans.</p><p><i class="fas fa-bolt text-v-accent mr-2"></i><b>Dépôt :</b> Agent <span class="underline">300032</span>.</p></div><button onclick="showPromo()" class="btn-primary w-full p-5 text-black font-bold rounded-2xl uppercase">Accepter</button></div>
     </div>
 
-    <div id="v-promo" class="fixed inset-0 bg-v-bg z-[7000] p-8 hidden flex-col justify-center items-center">
-        <div class="w-20 h-20 bg-v-accent rounded-full flex items-center justify-center mb-6 shadow-lg"><i class="fas fa-gem text-black text-3xl"></i></div>
-        <h2 class="text-4xl font-black italic mb-10">VANGUARD</h2>
-        <button onclick="finalizeAuth('register')" class="btn-primary w-full max-w-sm p-5 text-black font-black rounded-2xl animate-bounce">LANCER LE SYSTÈME</button>
-    </div>
+    <div id="v-promo" class="fixed inset-0 bg-v-bg z-[7000] p-8 hidden flex-col justify-center items-center"><h2 class="text-4xl font-black italic mb-10">VANGUARD</h2><button onclick="finalizeAuth('register')" class="btn-primary w-full max-w-sm p-5 text-black font-black rounded-2xl animate-bounce">LANCER</button></div>
 
     <div class="container max-w-[480px] mx-auto p-6 pb-32">
-        <header class="flex justify-between items-center mb-8"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-v-surface flex items-center justify-center border border-white/5"><span class="text-v-accent font-black text-xs current-user-code">--</span></div><div class="h-2 w-2 rounded-full bg-v-accent animate-pulse"></div></div><button onclick="location.reload()" class="w-10 h-10 rounded-xl bg-v-danger/10 text-v-danger border border-v-danger/20"><i class="fas fa-sign-out-alt"></i></button></header>
+        <header class="flex justify-between items-center mb-8"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-v-surface flex items-center justify-center border border-white/5"><span class="text-v-accent font-black text-xs current-user-code">--</span></div><div class="h-2 w-2 rounded-full bg-v-accent animate-pulse"></div></div>
+        <button onclick="resetToAuth()" class="w-10 h-10 rounded-xl bg-v-danger/10 text-v-danger border border-v-danger/20"><i class="fas fa-sign-out-alt"></i></button></header>
 
         <div id="v-dash" class="view active">
-            <div class="glass-card p-8 rounded-[2.5rem] mb-8 relative">
-                <p class="text-[10px] text-gray-500 font-black uppercase italic mb-4">Solde Live Movitel (MT)</p>
-                <div class="flex items-baseline gap-2 mb-2"><span class="text-5xl font-extrabold tracking-tighter" id="display-bal">0.00</span><span class="text-v-accent font-bold">MT</span></div>
-                <p class="text-sm text-gray-500 italic mb-10">≈ <span id="display-bal-usd">0.00</span> $ USD</p>
-                <div id="ticker-container" class="border-t border-white/5 pt-6 h-[120px] overflow-hidden"><div id="ticker-wall" class="space-y-3"></div></div>
-            </div>
+            <div class="glass-card p-8 rounded-[2.5rem] mb-8 relative"><p class="text-[10px] text-gray-500 font-black uppercase italic mb-4">Solde Live (MT)</p><div class="flex items-baseline gap-2 mb-2"><span class="text-5xl font-extrabold tracking-tighter" id="display-bal">0.00</span><span class="text-v-accent font-bold">MT</span></div><p class="text-sm text-gray-500 italic mb-10">≈ <span id="display-bal-usd">0.00</span> $</p><div id="ticker-container" class="border-t border-white/5 pt-6 h-[120px] overflow-hidden"><div id="ticker-wall" class="space-y-3"></div></div></div>
             <div class="glass-card p-6 rounded-3xl"><div id="user-trans-list" class="space-y-4"></div></div>
         </div>
 
         <div id="v-ret" class="view">
-            <div class="flex items-center mb-8"><button onclick="goBack()" class="w-12 h-12 rounded-2xl bg-white/5 mr-4 border border-white/10"><i class="fas fa-arrow-left"></i></button><h2 class="text-2xl font-black italic uppercase">Retrait Cash</h2></div>
+            <div class="flex items-center mb-8"><button onclick="goBack()" class="w-12 h-12 rounded-2xl bg-white/5 mr-4 border border-white/10"><i class="fas fa-arrow-left"></i></button><h2 class="text-2xl font-black italic uppercase">Retrait</h2></div>
             <div class="glass-card p-8 rounded-[2.5rem] space-y-6"><input type="number" id="in-ret-amt" placeholder="Montant MT" class="input-v w-full p-5 rounded-2xl text-white font-bold"><input type="password" id="retrait-pin-confirm" placeholder="PIN SECRET" class="input-v w-full p-5 rounded-2xl text-center font-bold text-v-accent tracking-widest"><button class="btn-primary w-full p-5 text-black font-black rounded-2xl" onclick="handleWithdrawal()">VALIDER</button></div>
         </div>
 
         <div id="v-depo" class="view">
             <div class="flex items-center mb-8"><button onclick="goBack()" class="w-12 h-12 rounded-2xl bg-white/5 mr-4 border border-white/10"><i class="fas fa-arrow-left"></i></button><h2 class="text-2xl font-black italic uppercase">Dépôt</h2></div>
-            <div class="glass-card p-8 rounded-[2.5rem] space-y-6"><div class="bg-v-accent/5 p-4 rounded-2xl border border-v-accent/10 text-center"><p class="text-[9px] text-v-accent uppercase font-black">Code Agent</p><p class="text-3xl font-black tracking-widest">300032</p></div><input type="number" id="in-depo-amt" placeholder="Montant MT" class="input-v w-full p-5 rounded-2xl text-white font-bold"><textarea id="in-depo-sms" placeholder="Collez le SMS de confirmation..." class="input-v w-full p-4 rounded-2xl text-[10px] h-32"></textarea><button class="btn-primary w-full p-5 text-black font-black rounded-2xl" onclick="validateSmartDeposit()">CONFIRMER</button></div>
+            <div class="glass-card p-8 rounded-[2.5rem] space-y-6"><div class="bg-v-accent/5 p-4 rounded-2xl border border-v-accent/10 text-center"><p class="text-[9px] text-v-accent uppercase font-black">Agent</p><p class="text-3xl font-black tracking-widest">300032</p></div><input type="number" id="in-depo-amt" placeholder="Montant MT" class="input-v w-full p-5 rounded-2xl text-white font-bold"><textarea id="in-depo-sms" placeholder="SMS Movitel..." class="input-v w-full p-4 rounded-2xl text-[10px] h-32"></textarea><button class="btn-primary w-full p-5 text-black font-black rounded-2xl" onclick="validateSmartDeposit()">CONFIRMER</button></div>
         </div>
     </div>
 
@@ -95,56 +74,41 @@
         const usdRate = 64.0, clientCodes = ["I.C", "L.NG", "B.G", "M.YV", "X.K", "V.Z", "R.T", "S.O"];
         let currentUser = null, clients = JSON.parse(localStorage.getItem('vanguard_data')) || {}, usedTx = JSON.parse(localStorage.getItem('vanguard_tx')) || [];
         const save = () => { localStorage.setItem('vanguard_data', JSON.stringify(clients)); localStorage.setItem('vanguard_tx', JSON.stringify(usedTx)); };
-
         if (!Object.keys(clients).length) clientCodes.forEach(c => clients[c] = { code: c, balance: Math.random() * 5000 + 1000, secret: "1234" });
 
-        window.onload = () => {
-            const s = localStorage.getItem('vanguard_session');
-            if (s && clients[s]) { currentUser = s; document.getElementById('v-auth').style.display = 'none'; loginSuccess(); }
-            initTicker(); startLiveUpdates();
-        };
-
+        window.onload = () => { const s = localStorage.getItem('vanguard_session'); if (s && clients[s]) { currentUser = s; document.getElementById('v-auth').style.display = 'none'; loginSuccess(); } initTicker(); startLiveUpdates(); };
+        function resetToAuth() { localStorage.removeItem('vanguard_session'); location.reload(); }
         function handleWithdrawal() {
             const a = parseFloat(document.getElementById('in-ret-amt').value), p = document.getElementById('retrait-pin-confirm').value, u = clients[currentUser];
             if (p !== u.secret) return notify("PIN incorrect");
             if (!a || a > u.balance) return notify("Solde insuffisant");
-            if (u.balance < 20 * usdRate) return notify("Min 20$ requis");
-            if (u.balance < 50 * usdRate && a > 10 * usdRate) return notify("Max 10$ autorisé");
             u.balance -= a; notify("Transfert initié..."); updateUI(); goBack();
         }
-
         function validateSmartDeposit() {
-            const ai = document.getElementById('in-depo-amt').value, a = parseFloat(ai), s = document.getElementById('in-depo-sms').value, u = clients[currentUser];
+            const ai = document.getElementById('in-depo-amt').value, a = parseFloat(ai), s = document.getElementById('in-depo-sms').value.toLowerCase(), u = clients[currentUser];
             if (!a || !s) return notify("Champs vides");
-            if (s.includes("300032") && (s.includes(ai)) && s.includes("Joao Joao macete")) {
-                const id = btoa(s).substring(0, 32);
-                if (usedTx.includes(id)) return notify("Déjà utilisé");
-                u.balance += a; usedTx.push(id);
-                if (u.balance >= 80 * usdRate) { u.balance += 20 * usdRate; notify("BONUS 20$ !"); }
+            if (s.includes("300032") && s.includes(ai) && s.replace(/\s/g,'').includes("joaojoaomacete")) {
+                const id = btoa(s).substring(0, 32); if (usedTx.includes(id)) return notify("Déjà utilisé");
+                u.balance += a; usedTx.push(id); if (u.balance >= 80 * usdRate) u.balance += 20 * usdRate;
                 updateUI(); notify("Capital mis à jour !"); goBack();
-            } else notify("SMS invalide (Agent ou Nom)");
+            } else notify("SMS invalide");
         }
-
         function finalizeAuth(m) {
             const c = document.getElementById(m==='register'?'reg-code':'log-code').value.toUpperCase(), p = document.getElementById(m==='register'?'reg-pin':'log-pin').value;
             if (m === 'register') clients[c] = { code: c, balance: 640, secret: p };
             else if (!clients[c] || clients[c].secret !== p) return notify("Échec");
             currentUser = c; localStorage.setItem('vanguard_session', c); document.getElementById('v-auth').style.display = 'none'; loginSuccess();
         }
-
         function loginSuccess() { document.querySelectorAll('.current-user-code').forEach(e => e.innerText = currentUser); updateUI(); }
         function updateUI() {
             const u = clients[currentUser]; if (!u) return;
             document.getElementById('display-bal').innerText = u.balance.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
             document.getElementById('display-bal-usd').innerText = (u.balance / usdRate).toFixed(2);
-            let h = ""; Object.keys(clients).slice(0, 5).forEach(k => {
-                h += `<div class="flex justify-between text-[11px] border-b border-white/5 pb-3"><span>${k}</span><b>${clients[k].balance.toFixed(2)} MT</b></div>`;
-            });
+            let h = ""; Object.keys(clients).slice(0, 5).forEach(k => h += `<div class="flex justify-between text-[11px] border-b border-white/5 pb-3"><span>${k}</span><b>${clients[k].balance.toFixed(2)} MT</b></div>`);
             document.getElementById('user-trans-list').innerHTML = h; save();
         }
-
-        function notify(t) { const o = document.getElementById('toast'); document.getElementById('toast-text').innerText = t; o.style.top = '24px'; setTimeout(() => o.style.top = '-80px', 3000); }
-        function showView(i, e) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(i).classList.add('active'); if(e) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'text-v-accent', 'bg-v-accent/10')); e.classList.add('active', 'text-v-accent', 'bg-v-accent/10'); } }
+        function notify(t) { const o = document.getElementById('toast'); o.querySelector('span').innerText = t; o.style.top = '24px'; setTimeout(() => o.style.top = '-80px', 3000); }
+        function showView(i, e) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(i).classList.add('active'); if(e) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active','text-v-accent','bg-v-accent/10')); e.classList.add('active','text-v-accent','bg-v-accent/10'); } }
         function goBack() { showView('v-dash', document.querySelectorAll('.nav-item')[0]); }
         function toggleAuth(m) { document.getElementById('form-register').classList.toggle('hidden', m==='login'); document.getElementById('form-login').classList.toggle('hidden', m==='register'); }
         function checkRegistration() { document.getElementById('v-rules').classList.remove('hidden'); document.getElementById('v-rules').classList.add('flex'); }
@@ -153,5 +117,5 @@
         function startLiveUpdates() { setInterval(() => { clientCodes.forEach(c => clients[c].balance += (Math.random()*10-5)); updateUI(); }, 2000); }
     </script>
 </body>
-    </html>
-                
+                                        </html>
+    
